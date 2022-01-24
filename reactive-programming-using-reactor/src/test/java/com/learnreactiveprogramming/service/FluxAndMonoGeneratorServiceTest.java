@@ -1,11 +1,15 @@
 package com.learnreactiveprogramming.service;
 
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.scheduler.VirtualTimeScheduler;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicReference;
 
 class FluxAndMonoGeneratorServiceTest {
 
@@ -40,8 +44,8 @@ class FluxAndMonoGeneratorServiceTest {
 
         //then
         StepVerifier.create(stringFlux)
-                //.expectNext("ALEX", "BEN", "CHLOE")
-                .expectNextCount(3)
+                .expectNext("alex", "ben", "chloe")
+                //.expectNextCount(3)
                 .verifyComplete();
 
 
@@ -146,6 +150,24 @@ class FluxAndMonoGeneratorServiceTest {
     }
 
     @Test
+    void namesFlux_flatmap_async_randomdelay(){
+        int stringLength = 3;
+        var namesFlux = fluxAndMonoGeneratorService.namesFlux_flatmap_async_withRandomDelay(stringLength);
+        StepVerifier.create(namesFlux)
+                     .expectSubscription()
+                      .consumeNextWith( System.out::println)
+                      .consumeNextWith( System.out::println)
+                     .consumeNextWith( System.out::println)
+                      .consumeNextWith( System.out::println)
+                     .consumeNextWith( System.out::println)
+                     .consumeNextWith( System.out::println)
+                   .consumeNextWith( System.out::println)
+                    .consumeNextWith( System.out::println)
+                    .consumeNextWith( System.out::println)
+                    .verifyComplete();
+     }
+
+    @Test
     void namesFlux_concatMap() {
 
         //given
@@ -225,7 +247,7 @@ class FluxAndMonoGeneratorServiceTest {
         //then
         StepVerifier.create(namesFlux)
                 .expectNext("A", "L", "E", "X")
-                .expectNextCount(5)
+                .expectNext("C", "H","L","O","E")
                 .verifyComplete();
 
     }
@@ -368,7 +390,7 @@ class FluxAndMonoGeneratorServiceTest {
         //then
         StepVerifier.create(value)
                 // .expectNext("A", "B", "C", "D", "E", "F")
-                .expectNext("A", "D", "B", "E", "C", "F")
+                .expectNext("D", "E", "F", "A", "B", "C")
                 .verifyComplete();
 
     }
@@ -430,7 +452,7 @@ class FluxAndMonoGeneratorServiceTest {
 
         //then
         StepVerifier.create(value)
-                .expectNext("AD", "BE", "CF")
+                .expectNext("AD", "BE" , "CF")
                 .verifyComplete();
 
     }
@@ -445,7 +467,7 @@ class FluxAndMonoGeneratorServiceTest {
 
         //then
         StepVerifier.create(value)
-                .expectNext("AD14", "BE25", "CF36")
+                .expectNext("AD147", "BE258", "CF369" )
                 .verifyComplete();
 
     }
@@ -495,5 +517,40 @@ class FluxAndMonoGeneratorServiceTest {
                 .verifyComplete();
 
     }
+    @Test
+    void explore_zipWith_mono_1() {
 
+        //given
+
+        //when
+        var value =
+                fluxAndMonoGeneratorService.explore_zipWith_mono_1().log();
+
+        //then
+        StepVerifier.create(value)
+                .expectNext("CD")
+                .verifyComplete();
+
+    }
+
+    @Test
+    void extractMonoTest(){
+        AtomicReference<Integer> myReference = new AtomicReference<>();
+        Mono<Integer> integerMono = Mono.just(1);
+        integerMono.subscribe(value -> myReference.set(value));
+        System.out.println(myReference.get());
+
+    }
+
+    @Test
+    void flatmapSubscribe(){
+       Flux<String> stringflux = Flux.fromIterable(List.of("alex", "chloe"))
+                .flatMap(name->Flux.fromArray(name.split("")))
+                        .delayElements(Duration.ofMillis(new Random().nextInt(1000)));
+
+        StepVerifier.create(stringflux)
+                .expectSubscription()
+                .expectNext("a")
+                .expectNextCount(8).verifyComplete();
+    }
 }
