@@ -544,13 +544,17 @@ class FluxAndMonoGeneratorServiceTest {
 
     @Test
     void flatmapSubscribe(){
-       Flux<String> stringflux = Flux.fromIterable(List.of("alex", "chloe"))
+         Flux.fromIterable(List.of("alex", "chloe"))
                 .flatMap(name->Flux.fromArray(name.split("")))
-                        .delayElements(Duration.ofMillis(new Random().nextInt(1000)));
-
-        StepVerifier.create(stringflux)
+                .delayElements(Duration.ofMillis(new Random().nextInt(500)))
+                .subscribe(System.out::println);
+         try {
+             Thread.sleep(6000);
+         }
+         catch (InterruptedException e) {}
+        /*StepVerifier.create(stringflux)
                 .expectSubscription()
                 .expectNext("a")
-                .expectNextCount(8).verifyComplete();
+                .expectNextCount(8).verifyComplete();*/
     }
 }
