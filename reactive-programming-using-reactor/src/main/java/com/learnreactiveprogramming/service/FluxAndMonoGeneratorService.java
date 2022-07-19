@@ -94,6 +94,15 @@ public class FluxAndMonoGeneratorService {
 
 
     }
+    public Flux<String> namesFlux_flatmap_async_withRandomDelay(int stringLength) {
+        var namesList = List.of("alex", "ben", "chloe"); // a, l, e , x
+        return Flux.fromIterable(namesList)
+                //.map(s -> s.toUpperCase())
+                .map(String::toUpperCase)
+                .filter(s -> s.length() > stringLength)
+                .flatMap(this::splitString_WithRandomDelay);
+    }
+
 
     public Flux<String> namesFlux_concatmap(int stringLength) {
         var namesList = List.of("alex", "ben", "chloe"); // a, l, e , x
@@ -102,7 +111,7 @@ public class FluxAndMonoGeneratorService {
                 .map(String::toUpperCase)
                 .filter(s -> s.length() > stringLength)
                 //.flatMap((name)-> splitString(name));
-                .concatMap(this::splitString_withDelay);
+                .concatMap(this::splitString);
 
     }
 
@@ -234,7 +243,7 @@ public class FluxAndMonoGeneratorService {
                 .delayElements(Duration.ofMillis(100));
 
         var defFlux = Flux.just("D", "E", "F")
-                .delayElements(Duration.ofMillis(125));
+                .delayElements(Duration.ofMillis(1));
 
         return Flux.merge(abcFlux, defFlux).log();
 
@@ -341,6 +350,16 @@ public class FluxAndMonoGeneratorService {
 
     }
 
+    public Mono<String> explore_zipWith_mono_1() {
+
+        var aMono = Mono.just("C");
+
+        var bMono = Mono.just("D");
+
+        return  Mono.zip(aMono, bMono, (first,second)-> first + second);
+
+    }
+
     /***
      * ALEX -> FLux(A,L,E,X)
      * @param name
@@ -356,6 +375,12 @@ public class FluxAndMonoGeneratorService {
         var charArray = name.split("");
         return Flux.fromArray(charArray)
                 .delayElements(Duration.ofMillis(delay));
+    }
+
+    private Flux<String> splitString_WithRandomDelay(String name){
+        var charArray = name.split("");
+        var delay = new Random().nextInt(1000);
+        return Flux.fromArray(charArray).delayElements(Duration.ofMillis(delay));
     }
 
     public static void main(String[] args) {
