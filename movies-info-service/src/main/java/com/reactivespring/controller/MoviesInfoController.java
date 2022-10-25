@@ -94,8 +94,9 @@ public class MoviesInfoController {
 
     @DeleteMapping("/movieinfos/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public Mono<Void> deleteMovieInfoById(@PathVariable String id){
-        return moviesInfoService.deleteMovieInfoById(id);
+    public Mono<ResponseEntity<?>> deleteMovieInfoById(@PathVariable String id){
+        return moviesInfoService.deleteMovieInfoById(id)
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
 
     }
 
