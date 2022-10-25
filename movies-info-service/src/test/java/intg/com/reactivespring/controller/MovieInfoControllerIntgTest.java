@@ -243,6 +243,18 @@ public class MovieInfoControllerIntgTest {
                 .expectStatus()
                 .isNoContent();
     }
+
+    @Test
+    void deleteMovie_notFound() {
+        var id = "abc2";
+
+        webTestClient
+                .delete()
+                .uri(MOVIES_INFO_URL + "/{id}", id)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
 }
 
 
