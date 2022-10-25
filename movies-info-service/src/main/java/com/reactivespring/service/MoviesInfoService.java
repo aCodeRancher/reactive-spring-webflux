@@ -3,6 +3,7 @@ package com.reactivespring.service;
 import com.reactivespring.domain.MovieInfo;
 import com.reactivespring.repository.MovieInfoRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.ConnectableFlux;
@@ -53,7 +54,11 @@ public class MoviesInfoService {
 
     }
 
-    public Mono<Void> deleteMovieInfoById(String id) {
-        return movieInfoRepository.deleteById(id);
+    public Mono<ResponseEntity<?>> deleteMovieInfoById(String id) {
+        return movieInfoRepository.findById(id)
+                .flatMap(movieInfo ->
+                        movieInfoRepository.deleteById(id)
+                                .then(Mono.just(ResponseEntity.noContent().build())));
+
     }
 }
