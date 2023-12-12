@@ -16,9 +16,9 @@ public class SinksTest {
         //Sinks.Many<Integer> replaySinks = Sinks.many().replay().latest();
         Sinks.Many<Integer> replaySinks = Sinks.many().replay().all();
 
-        var emitResult = replaySinks.tryEmitNext(1);
+        var emitResult = replaySinks.tryEmitNext(20);
         System.out.println("emitResult :  " + emitResult);
-        replaySinks.emitNext(2, Sinks.EmitFailureHandler.FAIL_FAST);
+        replaySinks.emitNext(210, Sinks.EmitFailureHandler.FAIL_FAST);
         /*Sinks.EmitResult emitResult1 = null;
         try {
             emitResult1 = replaySinks.tryEmitNext(errorFunction());
@@ -40,7 +40,13 @@ public class SinksTest {
                 .subscribe(s->{
                     System.out.println("Subscriber 2 : " + s);
                 });
+        replaySinks.tryEmitNext(330);
+        Flux<Integer> integerFlux2 = replaySinks.asFlux();
 
+        integerFlux2
+                .subscribe(s->{
+                    System.out.println("Subscriber 3 : " + s);
+                });
     }
 
 
